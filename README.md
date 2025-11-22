@@ -163,7 +163,7 @@ DEBUG=False
 SECRET_KEY=your-secret-key-here
 
 # Database Configuration
-DATABASE_URL=postgresql://user:password@localhost:5432/dbname
+DATABASE_URL=postgresql://username:password@localhost:5432/database_name
 
 # AI Service Configuration
 AI_API_KEY=your-ai-api-key
@@ -173,12 +173,20 @@ AI_MODEL=gpt-4
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USER=your-email@example.com
-EMAIL_PASSWORD=your-password
+EMAIL_PASSWORD=your-app-specific-password
 
 # Security Settings
 ALLOWED_HOSTS=localhost,127.0.0.1
 CORS_ALLOWED_ORIGINS=http://localhost:3000
 ```
+
+> **⚠️ Security Note**: 
+> - Never commit your `.env` file to version control (it's included in `.gitignore`)
+> - Use strong, unique passwords and secret keys in production
+> - For email, use app-specific passwords or OAuth tokens instead of regular passwords
+> - Store API keys securely and rotate them regularly
+> - Use environment-specific values (different keys for development, staging, and production)
+> - Consider using a secrets management service (e.g., AWS Secrets Manager, HashiCorp Vault) for production environments
 
 ### Customization Options
 
