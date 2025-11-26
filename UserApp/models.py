@@ -6,14 +6,18 @@ class User(AbstractUser):
     role = models.CharField(max_length=50, choices=[ ('student', 'Student'), ('instructor', 'Instructor')], default='student')
     specialite = models.CharField(max_length=100, blank=False, null=False)
     niveau_etude = models.CharField(max_length=100, blank=False, null=False)
-    date_naissance = models.DateField(blank=False, null=False)
+    date_naissance = models.DateField(blank=True, null=True)
     preferences=models.JSONField(blank=False, null=False, default=dict)
+    class Meta:
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
 
 class AdminUser(User):
     department = models.CharField(max_length=100, blank=False, null=False)
     permissions= models.JSONField(blank=False, null=False, default=dict)
-
-
+    class Meta:
+        verbose_name = 'Admin User'
+        verbose_name_plural = 'Admin Users'
     def save(self, *args, **kwargs):
         self.role = 'admin'
         super().save(*args, **kwargs)
@@ -22,7 +26,9 @@ class InstructorUser(User):
     experience_enseignement = models.IntegerField(blank=False, null=False)
     diploma = models.CharField(max_length=100, blank=False, null=False)
     formations_enseignees = models.JSONField(blank=False, null=False, default=list)
-
+    class Meta:
+        verbose_name = 'Instructor User'
+        verbose_name_plural = 'Instructor Users'
     def save(self, *args, **kwargs):
         self.role = 'instructor'
         super().save(*args, **kwargs)
@@ -30,6 +36,9 @@ class StudentUser(User):
     inscripted_formation = models.CharField(blank=False, null=False, max_length=100)
     progression_globale = models.IntegerField(blank=False, null=False)
     obtained_badges = models.JSONField(blank=False, null=False, default=list)
+    class Meta:
+        verbose_name = 'Student User'
+        verbose_name_plural = 'Student Users'
 
     def save(self, *args, **kwargs):
         self.role = 'student'
