@@ -10,3 +10,11 @@ class Chapitre(models.Model):
         on_delete=models.CASCADE,
         related_name='chapitres'
     )
+    
+    def __str__(self):
+        return self.titre
+    
+    class Meta:
+        verbose_name = "Chapitre"
+        verbose_name_plural = "Chapitres"
+        ordering = ['formation', 'ordre']

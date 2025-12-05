@@ -17,7 +17,17 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
+from django.contrib.auth.views import LogoutView
+from FormationApp.views import FormationListView
+from ChapitreApp.views import ChapitreListView
+from UserApp.views import RegisterView, CustomLoginView
 
 urlpatterns = [
+    path("", FormationListView.as_view(), name="home"),
+    path("login/", CustomLoginView.as_view(), name="login"),
+    path("logout/", LogoutView.as_view(next_page='/login/'), name="logout"),
+    path("register/", RegisterView.as_view(), name="register"),
     path("admin/", admin.site.urls),
+    path("formations/", FormationListView.as_view(), name="formation_list"),
+    path("chapitres/", ChapitreListView.as_view(), name="chapitre_list"),
 ]
