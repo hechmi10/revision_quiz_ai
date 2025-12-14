@@ -21,9 +21,10 @@ from django.contrib.auth.views import LogoutView
 from FormationApp.views import FormationListView
 from ChapitreApp.views import ChapitreListView
 from UserApp.views import RegisterView, CustomLoginView
+from revision_quiz_ai.views import HomeView
 
 urlpatterns = [
-    path("", FormationListView.as_view(), name="home"),
+    path("", HomeView.as_view(), name="home"),
     path("login/", CustomLoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(next_page='/login/'), name="logout"),
     path("register/", RegisterView.as_view(), name="register"),

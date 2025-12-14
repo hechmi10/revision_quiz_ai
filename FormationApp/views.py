@@ -12,4 +12,9 @@ class FormationListView(LoginRequiredMixin, ListView):
     login_url = '/login/'
 
     def get_queryset(self):
-        return Formation.objects.all().order_by('titre')
+        # Prefetch chapters to avoid N+1 queries when rendering formations with their chapters
+        return (
+            Formation.objects.all()
+            .prefetch_related('chapitres')
+            .order_by('titre')
+        )
