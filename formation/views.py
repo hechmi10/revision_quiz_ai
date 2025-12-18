@@ -1,9 +1,13 @@
 """
 Vues Django pour la gestion des quiz
 - home_view : Page d'accueil
+- formation_list_view : Liste des formations
+- formation_detail_view : Détails d'une formation
+- chapitre_list_view : Liste des chapitres
 - generer_quiz_view : Génération de quiz via IA (professeur)
 - quiz_detail_view : Affichage et passage du quiz (étudiant)
 - quiz_result_view : Affichage des résultats avec feedbacks IA
+- login_view, register_view, logout_view : Authentication
 """
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -13,10 +17,12 @@ from django.contrib import messages
 from django.db.models import F
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.forms import UserCreationForm
 import json
 import logging
 
-from .models import Chapitre, QuizQuestion, QuizResult, StudentUser, Formation
+from .models import Chapitre, QuizQuestion, QuizResult, StudentUser, Formation, CustomUser
 from .services import ServiceIA
 
 logger = logging.getLogger(__name__)
@@ -32,6 +38,100 @@ def home_view(request):
         'formations': formations,
     }
     return render(request, 'formation/home.html', context)
+
+
+def formation_list_view(request):
+    """
+    Vue pour lister toutes les formations.
+    """
+    formations = Formation.objects.all().order_by('-id')
+    context = {
+        'formations': formations,
+    }
+    return render(request, 'formation/formation_list.html', context)
+
+
+def formation_detail_view(request, formation_id):
+    """
+    Vue pour afficher les détails d'une formation et ses chapitres.
+    """
+    formation = get_object_or_404(Formation, id=formation_id)
+    chapitres = formation.chapitres.all().order_by('ordre')
+    
+    context = {
+        'formation': formation,
+        'chapitres': chapitres,
+    }
+    return render(request, 'formation/formation_detail.html', context)
+
+
+def chapitre_list_view(request):
+    """
+    Vue pour lister tous les chapitres organisés par formation.
+    """
+    formations = Formation.objects.all().prefetch_related('chapitres').order_by('-id')
+    context = {
+        'formations': formations,
+    }
+    return render(request, 'formation/chapitre_list.html', context)
+
+
+def login_view(request):
+    """
+    Vue pour la connexion des utilisateurs.
+    """
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            messages.success(request, f'Bienvenue {user.username} !')
+            return redirect('home')
+        else:
+            messages.error(request, 'Nom d\'utilisateur ou mot de passe incorrect.')
+    
+    return render(request, 'formation/login.html')
+
+
+def register_view(request):
+    """
+    Vue pour l'inscription des nouveaux utilisateurs.
+    """
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+        role = request.POST.get('role', 'STUDENT')
+        
+        if password1 != password2:
+            messages.error(request, 'Les mots de passe ne correspondent pas.')
+        elif CustomUser.objects.filter(username=username).exists():
+            messages.error(request, 'Ce nom d\'utilisateur existe déjà.')
+        elif CustomUser.objects.filter(email=email).exists():
+            messages.error(request, 'Cet email est déjà utilisé.')
+        else:
+            user = CustomUser.objects.create_user(
+                username=username,
+                email=email,
+                password=password1,
+                role=role
+            )
+            login(request, user)
+            messages.success(request, 'Compte créé avec succès !')
+            return redirect('home')
+    
+    return render(request, 'formation/register.html')
+
+
+def logout_view(request):
+    """
+    Vue pour la déconnexion des utilisateurs.
+    """
+    logout(request)
+    messages.success(request, 'Vous avez été déconnecté avec succès.')
+    return redirect('home')
 
 
 @login_required

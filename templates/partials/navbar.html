@@ -1,24 +1,65 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
-    <a class="navbar-brand" href="{% url 'home' %}">RevIA</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="mainNav">
-        <ul class="navbar-nav mr-auto">
-            {% if user.is_authenticated %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'formation_list' %}">Formations</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'chapitre_list' %}">Chapitres</a></li>
-            {% else %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
-            {% endif %}
-        </ul>
-        {% if user.is_authenticated %}
-            <form class="form-inline my-2 my-lg-0" method="post" action="{% url 'logout' %}">
-                {% csrf_token %}
-                <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Logout</button>
-            </form>
-        {% endif %}
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-primary" href="{% url 'home' %}">
+            <i class="fas fa-graduation-cap me-2"></i>RevIA
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}">
+                        <i class="fas fa-home me-1"></i>Accueil
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'formation_list' %}">
+                        <i class="fas fa-book me-1"></i>Formations
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'chapitre_list' %}">
+                        <i class="fas fa-list me-1"></i>Chapitres
+                    </a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i>{{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            {% if user.is_staff %}
+                                <li><a class="dropdown-item" href="{% url 'admin:index' %}">
+                                    <i class="fas fa-cog me-2"></i>Administration
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                            {% endif %}
+                            <li>
+                                <form method="post" action="{% url 'logout' %}">
+                                    {% csrf_token %}
+                                    <button class="dropdown-item" type="submit">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">
+                            <i class="fas fa-sign-in-alt me-1"></i>Connexion
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary btn-sm ms-2" href="{% url 'register' %}">
+                            <i class="fas fa-user-plus me-1"></i>S'inscrire
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
     </div>
 </nav>

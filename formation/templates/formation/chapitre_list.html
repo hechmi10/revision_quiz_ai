@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Chapitres{% endblock %}
+
+{% block content %}
+<style>
+    .chapitre-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 18px;
+        padding: 1.5rem;
+        color: #fff;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .chapitre-hero .hero-card {
+        background: #fff;
+        color: #111827;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-heading {
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        margin: 1.5rem 0 1rem;
+    }
+
+    .formation-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .formation-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .chapter-item {
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 0.85rem 1rem;
+        margin-bottom: 0.75rem;
+        background: #f9fafb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .chapter-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .badge-soft {
+        background: rgba(79, 70, 229, 0.1);
+        color: #4f46e5;
+        border-radius: 999px;
+        padding: 0.35rem 0.75rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .btn-ghost {
+        border: 1px solid #d1d5db;
+        background: #fff;
+        color: #374151;
+    }
+
+    .btn-ghost:hover {
+        background: #f3f4f6;
+        color: #111827;
+    }
+</style>
+
+<div class="chapitre-hero">
+    <div class="hero-card mb-3 d-flex flex-column flex-md-row justify-content-between align-items-start gap-3">
+        <div>
+            <h2 class="h3 mb-2"><i class="fas fa-book-open me-2"></i>Chapitres et formations</h2>
+            <p class="text-muted mb-0">Parcourez les chapitres disponibles et accédez directement aux quiz.</p>
+        </div>
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Retour à l'accueil
+        </a>
+    </div>
+
+    {% if formations %}
+        <div class="section-heading">
+            <i class="fas fa-layer-group"></i>
+            <span>Formations disponibles</span>
+        </div>
+
+        {% for formation in formations %}
+            <div class="formation-card">
+                <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                    <div>
+                        <h3 class="h5 mb-1 text-dark">{{ formation.titre }}</h3>
+                        <p class="text-muted mb-0 small">{{ formation.chapitres.count }} chapitre(s) liés</p>
+                    </div>
+                    <span class="badge-soft">Formation</span>
+                </div>
+
+                {% if formation.chapitres.all %}
+                    {% for chapitre in formation.chapitres.all|dictsort:"ordre" %}
+                        <div class="chapter-item">
+                            <div>
+                                <div class="fw-semibold text-dark">{{ chapitre.titre }}</div>
+                                <small class="text-muted">Ordre : {{ chapitre.ordre }}</small>
+                            </div>
+                            <div class="btn-group">
+                                <a href="{% url 'quiz_detail' quiz_id=chapitre.id %}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-question-circle"></i> Quiz
+                                </a>
+                                {% if user.is_authenticated and user.role == 'TEACHER' %}
+                                    <a href="{% url 'generer_quiz' chapitre_id=chapitre.id %}" class="btn btn-sm btn-ghost">
+                                        <i class="fas fa-magic"></i> Générer
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info mb-0" role="alert">
+                        Aucun chapitre pour cette formation.
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="hero-card text-center">
+            <i class="fas fa-inbox fa-3x text-muted mb-2"></i>
+            <h4 class="mb-1">Aucune formation ou chapitre disponible.</h4>
+            <p class="text-muted mb-0">Revenez plus tard pour découvrir de nouveaux contenus.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

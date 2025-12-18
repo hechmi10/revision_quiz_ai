@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     # Ton application
-    'formation',
+    'formation.apps.FormationConfig',
 ]
 
 MIDDLEWARE = [
@@ -70,8 +70,10 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        # CORRECTION ICI : On indique explicitement où sont les templates
-        'DIRS': [BASE_DIR / 'formation' / 'templates'],
+        'DIRS': [
+            BASE_DIR / 'templates',
+            BASE_DIR / 'formation' / 'templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -146,6 +148,11 @@ GROQ_API_KEY = os.environ.get('GROQ_API_KEY', None)
 # Modèle Groq à utiliser (par défaut: llama-3.3-70b-versatile)
 # Alternatives: llama-3.1-8b-instant, mixtral-8x7b-32768
 GROQ_MODEL = os.environ.get('GROQ_MODEL', 'llama-3.3-70b-versatile')
+
+# Authentication settings
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
 
 # Clé API OpenAI (payante) - Pour utiliser OpenAI au lieu de Groq
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', None)

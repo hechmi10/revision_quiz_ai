@@ -67,7 +67,7 @@ class Command(BaseCommand):
         # Création d'un étudiant
         etudiant = None
         if StudentUser.objects.filter(username='etudiant').exists():
-            etudiant = StudentUser.objects.get(username='etudiant')
+            _ = StudentUser.objects.get(username='etudiant')
             self.stdout.write(self.style.WARNING('  ⚠️  Étudiant existe déjà'))
         elif CustomUser.objects.filter(username='etudiant').exists():
             self.stdout.write(self.style.WARNING('  ⚠️  Un utilisateur "etudiant" existe déjà mais n\'est pas un StudentUser'))
@@ -136,7 +136,7 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING('  ⚠️  Formation "Python pour débutants" existe déjà'))
 
         # Chapitre 1.1
-        chapitre1_1, created = Chapitre.objects.get_or_create(
+        _, created = Chapitre.objects.get_or_create(
             formation=formation1,
             titre='Introduction à Python',
             defaults={
@@ -165,7 +165,7 @@ Une fois Python installé, vous pouvez vérifier l'installation en ouvrant un te
             self.stdout.write(self.style.WARNING('    ⚠️  Chapitre existe déjà'))
 
         # Chapitre 1.2
-        chapitre1_2, created = Chapitre.objects.get_or_create(
+        _, created = Chapitre.objects.get_or_create(
             formation=formation1,
             titre='Les variables et types de données',
             defaults={
@@ -221,7 +221,7 @@ Les variables en Python sont sensibles à la casse: nom et Nom sont deux variabl
             self.stdout.write(self.style.WARNING('  ⚠️  Formation "Développement Web avec Django" existe déjà'))
 
         # Chapitre 2.1
-        chapitre2_1, created = Chapitre.objects.get_or_create(
+        _, created = Chapitre.objects.get_or_create(
             formation=formation2,
             titre='Introduction à Django',
             defaults={
@@ -277,7 +277,7 @@ python manage.py startapp monapp
             self.stdout.write(self.style.WARNING('  ⚠️  Formation "Introduction à l\'Intelligence Artificielle" existe déjà'))
 
         # Chapitre 3.1
-        chapitre3_1, created = Chapitre.objects.get_or_create(
+        _, created = Chapitre.objects.get_or_create(
             formation=formation3,
             titre='Les bases du Machine Learning',
             defaults={
