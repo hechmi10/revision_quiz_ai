@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générer un Quiz - {{ chapitre.titre }}</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ============================================
+           VARIABLES CSS
+           ============================================ */
+        :root {
+            --primary-color: #4F46E5;
+            --primary-hover: #4338CA;
+            --success-color: #10B981;
+            --error-color: #EF4444;
+            --warning-color: #F59E0B;
+            --bg-light: #F9FAFB;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* ============================================
+           STYLES GÉNÉRAUX
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .container-custom {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* ============================================
+           CARD PRINCIPALE
+           ============================================ */
+        .card-main {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .card-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .card-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-header .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+        
+        /* ============================================
+           INFORMATIONS CHAPITRE
+           ============================================ */
+        .chapitre-info {
+            background: var(--bg-light);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .chapitre-info h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .chapitre-info p {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        
+        /* ============================================
+           FORMULAIRE
+           ============================================ */
+        .form-group {
+            margin-bottom: 2rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            display: block;
+            font-size: 1rem;
+        }
+        
+        .form-label i {
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+        }
+        
+        /* Slider personnalisé */
+        .slider-container {
+            position: relative;
+            padding: 1rem 0;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: var(--border-color);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+            background: var(--primary-hover);
+            transform: scale(1.1);
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+        }
+        
+        .slider-value {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 0.5rem;
+        }
+        
+        /* Sélecteur de difficulté */
+        .difficulte-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .difficulte-option {
+            position: relative;
+        }
+        
+        .difficulte-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .difficulte-option label {
+            display: block;
+            padding: 1rem;
+            text-align: center;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            background: white;
+        }
+        
+        .difficulte-option input[type="radio"]:checked + label {
+            border-color: var(--primary-color);
+            background: #EEF2FF;
+            color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .difficulte-option label:hover {
+            border-color: var(--primary-color);
+            background: var(--bg-light);
+        }
+        
+        /* ============================================
+           BOUTON GÉNÉRER
+           ============================================ */
+        .btn-generer {
+            width: 100%;
+            padding: 1.25rem 2rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-generer:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn-generer:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        .btn-generer:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-generer i {
+            margin-right: 0.5rem;
+        }
+        
+        /* ============================================
+           LOADER / SPINNER
+           ============================================ */
+        .loader-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        
+        .loader-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .loader-content {
+            background: white;
+            border-radius: var(--radius);
+            padding: 3rem;
+            text-align: center;
+            max-width: 400px;
+            margin: 1rem;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .loader-message {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .loader-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Barre de progression */
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            margin-top: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            border-radius: 3px;
+            width: 0%;
+            animation: progress 2s ease-in-out infinite;
+        }
+        
+        /* ============================================
+           MESSAGES DJANGO
+           ============================================ */
+        .messages {
+            margin-bottom: 2rem;
+        }
+        
+        .alert {
+            border-radius: var(--radius);
+            padding: 1rem 1.5rem;
+            border: none;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* ============================================
+           ANIMATIONS
+           ============================================ */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        @keyframes progress {
+            0% {
+                width: 0%;
+            }
+            50% {
+                width: 70%;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+            
+            .card-main {
+                padding: 1.5rem;
+            }
+            
+            .card-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .difficulte-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .slider-value {
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* ============================================
+           ACCESSIBILITÉ
+           ============================================ */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+        
+        /* Focus visible pour l'accessibilité */
+        .slider:focus,
+        .difficulte-option input[type="radio"]:focus + label,
+        .btn-generer:focus {
+            outline: 3px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-custom">
+        <!-- Messages Django -->
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <!-- Card principale -->
+        <div class="card-main">
+            <div class="card-header">
+                <h1><i class="fas fa-robot"></i> Génération de Quiz IA</h1>
+                <p class="subtitle">Créez un quiz personnalisé en quelques secondes</p>
+            </div>
+            
+            <!-- Informations du chapitre -->
+            <div class="chapitre-info">
+                <h3><i class="fas fa-book"></i> {{ chapitre.titre }}</h3>
+                <p>{{ chapitre.description|default:"Chapitre de la formation" }}</p>
+                {% if nombre_questions_actuel > 0 %}
+                    <p class="mt-2 mb-0"><small><i class="fas fa-info-circle"></i> {{ nombre_questions_actuel }} question(s) existante(s) pour ce chapitre</small></p>
+                {% endif %}
+            </div>
+            
+            <!-- Formulaire de génération -->
+            <form method="POST" id="form-generer-quiz">
+                {% csrf_token %}
+                
+                <!-- Slider nombre de questions -->
+                <div class="form-group">
+                    <label class="form-label" for="nombre_questions">
+                        <i class="fas fa-list-ol"></i> Nombre de questions
+                    </label>
+                    <div class="slider-container">
+                        <input 
+                            type="range" 
+                            class="slider" 
+                            id="nombre_questions" 
+                            name="nombre_questions" 
+                            min="5" 
+                            max="20" 
+                            value="10"
+                            aria-label="Nombre de questions"
+                        >
+                        <div class="slider-value" id="slider-value">10</div>
+                    </div>
+                </div>
+                
+                <!-- Sélecteur de difficulté -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-signal"></i> Niveau de difficulté
+                    </label>
+                    <div class="difficulte-group">
+                        <div class="difficulte-option">
+                            <input type="radio" id="difficulte_facile" name="difficulte" value="Facile" checked>
+                            <label for="difficulte_facile">
+                                <i class="fas fa-smile"></i><br>
+                                Facile
+                            </label>
+                        </div>
+                        <div class="difficulte-option">
+                            <input type="radio" id="difficulte_moyen" name="difficulte" value="Moyen">
+                            <label for="difficulte_moyen">
+                                <i class="fas fa-meh"></i><br>
+                                Moyen
+                            </label>
+                        </div>
+                        <div class="difficulte-option">
+                            <input type="radio" id="difficulte_difficile" name="difficulte" value="Difficile">
+                            <label for="difficulte_difficile">
+                                <i class="fas fa-frown"></i><br>
+                                Difficile
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bouton générer -->
+                <button type="submit" class="btn-generer" id="btn-generer">
+                    <i class="fas fa-magic"></i> Générer le Quiz avec l'IA
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Loader Overlay -->
+    <div class="loader-overlay" id="loader-overlay">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <div class="loader-message">L'IA génère votre quiz...</div>
+            <div class="loader-subtitle">Cela peut prendre 10 à 30 secondes</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        /* ============================================
+           JAVASCRIPT PERSONNALISÉ
+           ============================================ */
+        
+        // Section 1 : Variables et constantes
+        const slider = document.getElementById('nombre_questions');
+        const sliderValue = document.getElementById('slider-value');
+        const form = document.getElementById('form-generer-quiz');
+        const btnGenerer = document.getElementById('btn-generer');
+        const loaderOverlay = document.getElementById('loader-overlay');
+        
+        // Section 2 : Fonctions utilitaires
+        function afficherLoader() {
+            loaderOverlay.classList.add('active');
+            btnGenerer.disabled = true;
+            btnGenerer.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Génération en cours...';
+        }
+        
+        function masquerLoader() {
+            loaderOverlay.classList.remove('active');
+            btnGenerer.disabled = false;
+            btnGenerer.innerHTML = '<i class="fas fa-magic"></i> Générer le Quiz avec l\'IA';
+        }
+        
+        function mettreAJourSlider() {
+            const value = slider.value;
+            sliderValue.textContent = value;
+            sliderValue.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                sliderValue.style.transform = 'scale(1)';
+            }, 200);
+        }
+        
+        // Section 3 : Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialisation du slider
+            mettreAJourSlider();
+            
+            // Mise à jour du slider en temps réel
+            slider.addEventListener('input', mettreAJourSlider);
+            
+            // Soumission du formulaire
+            form.addEventListener('submit', function(e) {
+                // Validation côté client
+                const nombreQuestions = parseInt(slider.value);
+                if (nombreQuestions < 5 || nombreQuestions > 20) {
+                    e.preventDefault();
+                    alert('Le nombre de questions doit être entre 5 et 20.');
+                    return false;
+                }
+                
+                // Affichage du loader
+                afficherLoader();
+                
+                // Le formulaire sera soumis normalement
+                // Le loader restera affiché jusqu'à la redirection
+            });
+            
+            // Gestion des erreurs réseau (si le formulaire échoue)
+            window.addEventListener('beforeunload', function() {
+                // Si l'utilisateur quitte la page pendant le chargement
+                if (loaderOverlay.classList.contains('active')) {
+                    return 'La génération du quiz est en cours. Êtes-vous sûr de vouloir quitter ?';
+                }
+            });
+        });
+        
+        // Section 4 : Gestion des erreurs
+        window.addEventListener('error', function(e) {
+            console.error('Erreur JavaScript:', e);
+            masquerLoader();
+        });
+        
+        // Fallback : masquer le loader après 60 secondes maximum
+        setTimeout(function() {
+            if (loaderOverlay.classList.contains('active')) {
+                console.warn('Timeout du loader - masquage automatique');
+                masquerLoader();
+            }
+        }, 60000);
+    </script>
+</body>
+</html>
+

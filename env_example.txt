@@ -1,0 +1,13 @@
+# Configuration API IA
+# Copiez ce fichier vers .env et remplissez vos clés API
+# Pour Windows PowerShell : Copy-Item env_example.txt .env
+
+# Clé API Groq (gratuite) - Obtenez-la sur https://console.groq.com/
+GROQ_API_KEY=
+
+# Provider IA : 'groq' (gratuit, recommandé) ou 'openai'
+AI_PROVIDER=groq
+
+# Si vous utilisez OpenAI (optionnel, pour revenir à OpenAI)
+# OPENAI_API_KEY=
+

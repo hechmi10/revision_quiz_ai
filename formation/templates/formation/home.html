@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plateforme e-Learning - Accueil</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #4F46E5;
+            --primary-hover: #4338CA;
+            --success-color: #10B981;
+            --bg-light: #F9FAFB;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+        
+        .container-main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header-card {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+        
+        .header-card h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .header-card p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+        
+        .formation-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .formation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .formation-card h3 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .formation-card .badge {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            margin-right: 0.5rem;
+        }
+        
+        .btn-action {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+            margin-right: 0.5rem;
+        }
+        
+        .btn-action:hover {
+            background: var(--primary-hover);
+            color: white;
+        }
+        
+        .btn-secondary-action {
+            background: var(--text-secondary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+        
+        .btn-secondary-action:hover {
+            background: #4B5563;
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-main">
+        <!-- En-tête -->
+        <div class="header-card">
+            <h1><i class="fas fa-graduation-cap"></i> Plateforme e-Learning</h1>
+            <p>Découvrez nos formations et testez vos connaissances avec nos quiz interactifs</p>
+            {% if user.is_authenticated %}
+                <p class="mt-3">
+                    <strong>Connecté en tant que :</strong> {{ user.username }}
+                    <a href="{% url 'admin:index' %}" class="btn btn-outline-primary ms-3">
+                        <i class="fas fa-cog"></i> Administration
+                    </a>
+                    <a href="{% url 'admin:logout' %}" class="btn btn-outline-secondary ms-2">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </a>
+                </p>
+            {% else %}
+                <p class="mt-3">
+                    <a href="{% url 'admin:login' %}" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Se connecter
+                    </a>
+                </p>
+            {% endif %}
+        </div>
+        
+        <!-- Liste des formations -->
+        {% if formations %}
+            <h2 class="text-white mb-4"><i class="fas fa-book"></i> Formations disponibles</h2>
+            
+            {% for formation in formations %}
+                <div class="formation-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h3>{{ formation.titre }}</h3>
+                            <p class="text-muted mb-3">{{ formation.description|truncatewords:30 }}</p>
+                            <div class="mb-3">
+                                <span class="badge bg-primary">{{ formation.niveau }}</span>
+                                {% if formation.est_public %}
+                                    <span class="badge bg-success">Publique</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Privée</span>
+                                {% endif %}
+                                <span class="badge bg-info">{{ formation.chapitres.count }} chapitre(s)</span>
+                            </div>
+                            <p class="text-muted small">
+                                <i class="fas fa-user"></i> Créé par : {{ formation.createur.username }}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="mt-3">
+                        {% for chapitre in formation.chapitres.all %}
+                            <a href="{% url 'quiz_detail' quiz_id=chapitre.id %}" class="btn btn-action">
+                                <i class="fas fa-question-circle"></i> Passer le quiz : {{ chapitre.titre }}
+                            </a>
+                            {% if user.is_authenticated and user.role == 'TEACHER' %}
+                                <a href="{% url 'generer_quiz' chapitre_id=chapitre.id %}" class="btn btn-secondary-action">
+                                    <i class="fas fa-magic"></i> Générer un quiz (IA)
+                                </a>
+                            {% endif %}
+                        {% empty %}
+                            <p class="text-muted">Aucun chapitre disponible pour cette formation.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>Aucune formation disponible</h3>
+                <p class="text-muted">
+                    Il n'y a pas encore de formations disponibles.
+                    {% if user.is_authenticated and user.role == 'TEACHER' %}
+                        <a href="{% url 'admin:formation_formation_add' %}">Créez-en une depuis l'administration</a>.
+                    {% endif %}
+                </p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
